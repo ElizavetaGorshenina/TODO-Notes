@@ -7,5 +7,5 @@ class User(models.Model):
     username = models.CharField(max_length=64)
     firstname = models.CharField(max_length=64)
     lastname = models.CharField(max_length=64)
-    birth_date = models.DateField()
+    birth_date = models.DateField(null=True)
     email = models.CharField(max_length=256, unique=True)
