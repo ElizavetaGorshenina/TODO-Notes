@@ -1,7 +1,6 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-//import MenuItem from './components/Menu.js'
 import UserList from './components/User.js'
 import ProjectList from './components/Project.js'
 import UserProjectList from './components/UserProject.js'
@@ -47,15 +46,28 @@ class App extends React.Component {
   get_token(username, password) {
     axios.post('http://127.0.0.1:8000/auth-jwt/', {username: username, password: password})
       .then(response => {
-        this.set_token(response.data['access'])
+        document.getElementById('username').textContent=this.username
       }).catch(error => alert('Incorrect login or password'))
     }
+
+  get_headers() {
+    let headers = {
+      'Content-Type': 'application/json'
+    }
+    if (this.is_authenticated())
+    {
+      headers['Authorization'] = 'Bearer ' + this.state.token
+      console.log(headers)
+    }
+    return headers
+  }
   
   load_data(){
+    const headers = this.get_headers()
     axios.all([
-      axios.get('http://127.0.0.1:8000/users/'),
-      axios.get('http://127.0.0.1:8000/projects/'),
-      axios.get('http://127.0.0.1:8000/todo/')
+      axios.get('http://127.0.0.1:8000/users/', {headers}),
+      axios.get('http://127.0.0.1:8000/projects/', {headers}),
+      axios.get('http://127.0.0.1:8000/todo/', {headers})
     ]).then(axios.spread((res_users, res_projects, res_todoes) => {
       const users = res_users.data.results
       const projects = res_projects.data.results
@@ -66,7 +78,14 @@ class App extends React.Component {
           'todoes': todoes
         });
       })
-      ).catch(error => console.log(error))
+      ).catch(error => {
+        console.log(error)
+        this.setState({
+          'users': [],
+          'projects': [],
+          'todoes': []
+        });
+      })
   }
 
   componentDidMount() {
