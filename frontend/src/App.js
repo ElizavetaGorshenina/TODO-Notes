@@ -22,6 +22,13 @@ class App extends React.Component {
       'todoes': []
     }
   }
+
+  get_token(username, password) {
+    axios.post('http://127.0.0.1:8000/auth-jwt/', {username: username, password: password})
+      .then(response => {
+        console.log(response.data)
+      }).catch(error => alert('Incorrect login or password'))
+    }
   
   componentDidMount() {
     axios.all([
@@ -51,7 +58,8 @@ class App extends React.Component {
             <Route exact path='/projects' component={() => <ProjectList projects={this.state.projects} />} />
             <Route exact path='/user/:username' component={() => <UserProjectList projects={this.state.projects} />} />
             <Route exact path='/todoes' component={() => <ToDoList todoes={this.state.todoes} />} />
-            <Route exact path='/login' component={() => <LoginForm />} />
+            <Route exact path='/login' component={() => <LoginForm 
+              get_token={(username, password) => this.get_token(username, password)} />} />
             <Redirect from='/todos' to='/todoes' />
             <Redirect from='/' to='/users' />
             <Route component={NotFound404} />
