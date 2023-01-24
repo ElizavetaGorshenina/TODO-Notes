@@ -6,7 +6,8 @@ import UserList from './components/User.js'
 import ProjectList from './components/Project.js'
 import UserProjectList from './components/UserProject.js'
 import ToDoList from './components/ToDo.js'
-import NotFound404 from './components/NotFoundPage'
+import NotFound404 from './components/NotFoundPage.js'
+import LoginForm from './components/Login.js'
 import FooterItem from './components/Footer.js'
 import axios from 'axios'
 import {Route, Switch, Redirect, BrowserRouter} from 'react-router-dom'
@@ -50,6 +51,7 @@ class App extends React.Component {
             <Route exact path='/projects' component={() => <ProjectList projects={this.state.projects} />} />
             <Route exact path='/user/:username' component={() => <UserProjectList projects={this.state.projects} />} />
             <Route exact path='/todoes' component={() => <ToDoList todoes={this.state.todoes} />} />
+            <Route exact path='/login' component={() => <LoginForm />} />
             <Redirect from='/todos' to='/todoes' />
             <Redirect from='/' to='/users' />
             <Route component={NotFound404} />

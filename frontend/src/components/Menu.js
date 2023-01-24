@@ -15,6 +15,9 @@ const MenuItem = () => {
                 <li>
                     <Link to='/todoes'>ToDo Notes</Link>
                 </li>
+                <li>
+                    <Link to='/login'>Login</Link>
+                </li>
             </ul>
         </nav>
     )
