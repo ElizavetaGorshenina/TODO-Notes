@@ -1,5 +1,6 @@
 import React from 'react'
 import {Link} from 'react-router-dom'
+import App from './components/App.js'
 
 
 const MenuItem = () => {
@@ -16,7 +17,8 @@ const MenuItem = () => {
                     <Link to='/todoes'>ToDo Notes</Link>
                 </li>
                 <li>
-                    <Link to='/login'>Login</Link>
+                    {this.App.is_authenticated() ? <button onClick={()=>this.App.logout()}>Logout</button> : 
+                        <Link to='/login'>Login</Link>}
                 </li>
             </ul>
         </nav>

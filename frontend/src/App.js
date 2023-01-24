@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import MenuItem from './components/Menu.js'
+//import MenuItem from './components/Menu.js'
 import UserList from './components/User.js'
 import ProjectList from './components/Project.js'
 import UserProjectList from './components/UserProject.js'
@@ -10,7 +10,7 @@ import NotFound404 from './components/NotFoundPage.js'
 import LoginForm from './components/Login.js'
 import FooterItem from './components/Footer.js'
 import axios from 'axios'
-import {Route, Switch, Redirect, BrowserRouter} from 'react-router-dom'
+import {Route, Switch, Redirect, BrowserRouter, Link} from 'react-router-dom'
 import Cookies from 'universal-cookie'
 
 
@@ -33,6 +33,10 @@ class App extends React.Component {
   is_authenticated() {
     return this.state.token != ''
     }
+
+  logout() {
+    this.set_token('')
+  }      
 
   get_token_from_storage() {
     const cookies = new Cookies()
@@ -73,7 +77,23 @@ class App extends React.Component {
     return (
       <div className='App'>
         <BrowserRouter>
-          <MenuItem />
+          <nav>
+              <ul>
+                  <li>
+                      <Link to='/users'>Users</Link>
+                  </li>
+                  <li>
+                      <Link to='/projects'>Projects</Link>
+                  </li>
+                  <li>
+                      <Link to='/todoes'>ToDo Notes</Link>
+                  </li>
+                  <li>
+                      {this.is_authenticated() ? <button onClick={()=>this.logout()}>Logout</button> : 
+                          <Link to='/login'>Login</Link>}
+                  </li>
+              </ul>
+          </nav>
           <Switch>
             <Route exact path='/users' component={() => <UserList users={this.state.users} />} />
             <Route exact path='/projects' component={() => <ProjectList projects={this.state.projects} />} />
