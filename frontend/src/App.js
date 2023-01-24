@@ -11,6 +11,7 @@ import LoginForm from './components/Login.js'
 import FooterItem from './components/Footer.js'
 import axios from 'axios'
 import {Route, Switch, Redirect, BrowserRouter} from 'react-router-dom'
+import Cookies from 'universal-cookie'
 
 
 class App extends React.Component {
@@ -23,14 +24,30 @@ class App extends React.Component {
     }
   }
 
+  set_token(token) {
+    const cookies = new Cookies()
+    cookies.set('token', token)
+    this.setState({'token': token}, () => this.load_data())
+    }
+
+  is_authenticated() {
+    return this.state.token != ''
+    }
+
+  get_token_from_storage() {
+    const cookies = new Cookies()
+    const token = cookies.get('token')
+    this.setState({'token': token}, () => this.load_data())
+    }
+
   get_token(username, password) {
     axios.post('http://127.0.0.1:8000/auth-jwt/', {username: username, password: password})
       .then(response => {
-        console.log(response.data)
+        this.set_token(response.data['access'])
       }).catch(error => alert('Incorrect login or password'))
     }
   
-  componentDidMount() {
+  load_data(){
     axios.all([
       axios.get('http://127.0.0.1:8000/users/'),
       axios.get('http://127.0.0.1:8000/projects/'),
@@ -46,6 +63,10 @@ class App extends React.Component {
         });
       })
       ).catch(error => console.log(error))
+  }
+
+  componentDidMount() {
+    this.get_token_from_storage()
   }
 
   render () {
