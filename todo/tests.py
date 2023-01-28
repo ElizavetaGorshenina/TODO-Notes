@@ -6,6 +6,7 @@ from .views import ToDoModelViewSet
 from .models import Project
 from users.models import User as ToDoUser
 from django.contrib.auth.models import User, Permission
+from mixer.backend.django import mixer
 
 
 class TestToDoViewSet(TestCase):
@@ -36,6 +37,21 @@ class TestProjectViewSet(APITestCase):
         project = Project.objects.create(name='Electronic store', link_to_repo='a_link')
         project.user.add(user)
         project.save()
+        admin = User.objects.create_user('Andy', 'andyadmin@develops.com', 'andyadmin')
+        permission_project_view = Permission.objects.get(codename='view_project')
+        permission_project_delete = Permission.objects.get(codename='delete_project')
+        admin.user_permissions.add(permission_project_view, permission_project_delete)
+        admin.save()
+        self.client.login(username='Andy', password='andyadmin')
+        response = self.client.delete(f'/projects/{project.id}/')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        response = self.client.get(f'/projects/{project.id}/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.client.logout()
+
+
+    def test_delete_admin_with_mixer(self):
+        project = mixer.blend(Project)
         admin = User.objects.create_user('Andy', 'andyadmin@develops.com', 'andyadmin')
         permission_project_view = Permission.objects.get(codename='view_project')
         permission_project_delete = Permission.objects.get(codename='delete_project')
