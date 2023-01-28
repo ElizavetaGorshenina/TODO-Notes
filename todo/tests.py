@@ -1,10 +1,11 @@
 import json
 from django.test import TestCase
 from rest_framework import status
-from rest_framework.test import APIRequestFactory, force_authenticate, APIClient
+from rest_framework.test import APIRequestFactory, force_authenticate, APIClient, APITestCase
 from .views import ToDoModelViewSet
+from .models import Project
 from users.models import User as ToDoUser
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 
 
 class TestToDoViewSet(TestCase):
@@ -26,3 +27,23 @@ class TestUserViewSet(TestCase):
         client = APIClient()
         response = client.get(f'/users/{user.id}/')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class TestProjectViewSet(APITestCase):
+
+    def test_delete_admin(self):
+        user = ToDoUser.objects.create(username='Paul', firstname='Paul', lastname='Moses', birth_date='1981-08-11', email='paul@home.com')
+        project = Project.objects.create(name='Electronic store', link_to_repo='a_link')
+        project.user.add(user)
+        project.save()
+        admin = User.objects.create_user('Andy', 'andyadmin@develops.com', 'andyadmin')
+        permission_project_view = Permission.objects.get(codename='view_project')
+        permission_project_delete = Permission.objects.get(codename='delete_project')
+        admin.user_permissions.add(permission_project_view, permission_project_delete)
+        admin.save()
+        self.client.login(username='Andy', password='andyadmin')
+        response = self.client.delete(f'/projects/{project.id}/')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        response = self.client.get(f'/projects/{project.id}/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.client.logout()
