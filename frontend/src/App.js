@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import UserList from './components/User.js'
 import ProjectList from './components/Project.js'
+import ProjectForm from './components/ProjectForm.js'
 import UserProjectList from './components/UserProject.js'
 import ToDoList from './components/ToDo.js'
 import NotFound404 from './components/NotFoundPage.js'
@@ -19,7 +20,8 @@ class App extends React.Component {
     this.state = {
       'users': [],
       'projects': [],
-      'todoes': []
+      'todoes': [],
+      'token': ''
     }
   }
 
@@ -46,7 +48,7 @@ class App extends React.Component {
   get_token(username, password) {
     axios.post('http://127.0.0.1:8000/auth-jwt/', {username: username, password: password})
       .then(response => {
-        document.getElementById('username').textContent=this.username
+        this.set_token(response.data['access'])
       }).catch(error => alert('Incorrect login or password'))
     }
 
@@ -88,6 +90,27 @@ class App extends React.Component {
       })
   }
 
+  createProject(name, user, link_to_repo) {
+    const headers = this.get_headers()
+    const data = {name: name, user: [user], link_to_repo: link_to_repo}
+    axios.post(`http://127.0.0.1:8000/projects/`, data, {headers, headers})
+      .then(response => {
+        let new_prodj = response.data
+        const user = this.state.users.filter((user) => user.email === new_prodj.user[0].email)[0]
+        new_prodj.user[0] = user
+        this.setState({projects: [...this.state.projects, new_prodj]})
+      }).catch(error => console.log(error.response))
+  }
+
+  deleteProject(url) {
+    const headers = this.get_headers()
+    axios.delete(`${url}`, {headers})
+    .then(response => {
+    this.setState({projects: this.state.projects.filter((project)=>project.url !==
+    url)})
+    }).catch(error => console.log(error))
+  }
+
   componentDidMount() {
     this.get_token_from_storage()
   }
@@ -115,6 +138,9 @@ class App extends React.Component {
           </nav>
           <Switch>
             <Route exact path='/users' component={() => <UserList users={this.state.users} />} />
+            <Route exact path='/projects' component={() => <ProjectList projects={this.state.projects} deleteProject={(id)=>this.deleteProject(id)} />} />
+            <Route exact path='/projects/create' component={() => <ProjectForm
+              users={this.state.users} createProject={(name, user, link_to_repo) => this.createProject(name, user, link_to_repo)} />} />
             <Route exact path='/projects' component={() => <ProjectList projects={this.state.projects} />} />
             <Route exact path='/user/:username' component={() => <UserProjectList projects={this.state.projects} />} />
             <Route exact path='/todoes' component={() => <ToDoList todoes={this.state.todoes} />} />
