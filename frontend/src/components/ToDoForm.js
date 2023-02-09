@@ -1,10 +1,10 @@
 import React from 'react'
 
 
-class ProjectForm extends React.Component {
+class ToDoForm extends React.Component {
     constructor(props) {
         super(props)
-        this.state = {name: '', user: props.users[0]?.email, link_to_repo: ''}
+        this.state = {text: '', user: props.users[0]?.email, project: props.projects[0]?.link_to_repo}
     }
 
     handleChange(event)
@@ -17,7 +17,8 @@ class ProjectForm extends React.Component {
     }
 
     handleSubmit(event) {
-        this.props.createProject(this.state.name, this.state.user, this.state.link_to_repo)
+        this.props.createToDo(this.state.text, this.state.user, this.state.project)
+        console.log(this.state.project)
         event.preventDefault()
     }
 
@@ -25,9 +26,9 @@ class ProjectForm extends React.Component {
         return (
             <form onSubmit={(event)=> this.handleSubmit(event)}>
                 <div className="form-group">
-                <label for="name">name</label>
-                    <input type="text" className="form-control" name="name"
-                        value={this.state.name} onChange={(event)=>this.handleChange(event)} />
+                <label for="text">text</label>
+                    <input type="text" className="form-control" name="text"
+                        value={this.state.text} onChange={(event)=>this.handleChange(event)} />
                 </div>
                 <div className="form-group">
                 <label for="user">user</label>
@@ -38,9 +39,12 @@ class ProjectForm extends React.Component {
                 </select>
                 </div>
                 <div className="form-group">
-                <label for="link_to_repo">link_to_repo</label>
-                    <input type="string" className="form-control" name="link_to_repo"
-                        value={this.state.link_to_repo} onChange={(event)=>this.handleChange(event)} />
+                <label for="project">project</label>
+                <select name="project" className='form-control'
+                    onChange={(event)=>this.handleChange(event)}>
+                    {this.props.projects.map((project)=><option
+                    value={project.link_to_repo}>{project.name}</option>)}
+                </select>
                 </div>
                 <input type="submit" className="btn btn-primary" value="Save" />
             </form>
@@ -49,4 +53,4 @@ class ProjectForm extends React.Component {
 }
 
 
-export default ProjectForm
+export default ToDoForm

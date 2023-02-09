@@ -17,7 +17,7 @@ class ProjectModelSerializer(HyperlinkedModelSerializer,
 class ProjectForToDoModelSerializer(HyperlinkedModelSerializer):
     class Meta:
         model = Project
-        fields = ['name']
+        fields = ['name', 'link_to_repo']
 
 
 class UserForToDoModelSerializer(HyperlinkedModelSerializer):
@@ -26,7 +26,8 @@ class UserForToDoModelSerializer(HyperlinkedModelSerializer):
         fields = ['username', 'email']
 
 
-class ToDoModelSerializer(HyperlinkedModelSerializer):
+class ToDoModelSerializer(HyperlinkedModelSerializer,
+                            WritableNestedModelSerializer):
     user = UserForToDoModelSerializer()
     project = ProjectForToDoModelSerializer()
     
