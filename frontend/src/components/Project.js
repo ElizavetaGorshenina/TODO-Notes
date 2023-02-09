@@ -22,9 +22,12 @@ const ProjectItem = ({project, deleteProject}) => {
 }
 
 
-const ProjectList = ({projects, deleteProject}) => {
+const ProjectList = ({projects, deleteProject, searchProject}) => {
     return (
         <div>
+        <label for="search">Search project by name </label>
+        <input type="text" id="search"/>
+        <button onClick={()=>searchProject(document.getElementById('search').value)} type='button'>Search</button>
         <table>
             <th>
                 Project Name

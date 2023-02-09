@@ -116,6 +116,11 @@ class App extends React.Component {
     }).catch(error => console.log(error))
   }
 
+  searchProject(text) {
+    const target_projects = this.state.projects.filter((project) => (project.name.indexOf(text) + 1) !== 0)
+    this.setState({projects: target_projects})
+  }
+
   createToDo(text, user_email, project_link_to_repo) {
     const headers = this.get_headers()
     const user = this.state.users.filter((user) => user.email === user_email)[0]
@@ -166,7 +171,7 @@ class App extends React.Component {
           </nav>
           <Switch>
             <Route exact path='/users' component={() => <UserList users={this.state.users} />} />
-            <Route exact path='/projects' component={() => <ProjectList projects={this.state.projects} deleteProject={(url)=>this.deleteProject(url)} />} />
+            <Route exact path='/projects' component={() => <ProjectList projects={this.state.projects} deleteProject={(url)=>this.deleteProject(url)} searchProject={(text)=>this.searchProject(text)} />} />
             <Route exact path='/projects/create' component={() => <ProjectForm
               users={this.state.users} createProject={(name, user, link_to_repo) => this.createProject(name, user, link_to_repo)} />} />
             <Route exact path='/user/:username' component={() => <UserProjectList projects={this.state.projects} />} />
